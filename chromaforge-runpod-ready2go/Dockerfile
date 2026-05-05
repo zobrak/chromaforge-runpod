@@ -13,7 +13,7 @@
 # Compatible avec un volume persistant vierge.
 #
 # Ce qui reste sur le volume persistant (NV RunPod) :
-#   - Le venv forge (~10 Go) — restauré depuis zobrak.net/downloads au 1er boot
+#   - Le venv forge (~10 Go) — restauré depuis Filebase IPFS au 1er boot
 #   - Les modèles Chroma (~27 Go) — téléchargés depuis HuggingFace au 1er boot
 #   - Les outputs générés
 #   - /workspace/.bashrc
@@ -27,7 +27,7 @@ FROM runpod/pytorch:2.2.0-py3.10-cuda12.1.1-devel-ubuntu22.04
 # Métadonnées
 LABEL maintainer="zobrak"
 LABEL description="ChromaForge on RunPod — Flux/Chroma image generation"
-LABEL version="1.0"
+LABEL version="1.0.0"
 
 # Évite les interactions lors des installations apt
 ENV DEBIAN_FRONTEND=noninteractive
@@ -70,6 +70,7 @@ RUN apt-get update -qq && \
 COPY runpod_chromaforge_start.sh /opt/runpod_chromaforge_start.sh
 COPY runpod_chromaforge_run.sh /opt/runpod_chromaforge_run.sh
 COPY .bashrc /opt/.bashrc
+COPY venv.tar.zst.sha256 /opt/venv.tar.zst.sha256
 RUN chmod +x /opt/runpod_chromaforge_start.sh /opt/runpod_chromaforge_run.sh
 
 # =============================================================================

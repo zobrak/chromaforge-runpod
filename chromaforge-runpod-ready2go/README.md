@@ -1,20 +1,25 @@
 # ChromaForge RunPod — Ready to Go
 
+**Version 1.0.0**
+
 Fork de Stable Diffusion WebUI Forge optimisé pour le modèle Chroma, déployable sur RunPod avec un volume persistant vierge. ChromaForge démarre automatiquement au lancement du pod.
 
 ## Ce que contient cette image
 
-- Ubuntu 22.04 + CUDA 12.1.1 + Python 3.10
+- Ubuntu 22.04 + CUDA 12.1.1 + Python 3.10 (paquets système à jour)
 - Toutes les dépendances système requises par ChromaForge
 - Scripts `runpod_chromaforge_start.sh` et `runpod_chromaforge_run.sh`
 - `.bashrc` personnalisé
+- `venv.tar.zst.sha256` — hash de vérification d'intégrité du venv
 
 ## Ce qui est géré automatiquement
 
 ### Au premier démarrage (volume vierge)
 
 - Clonage de [zobrak/chromaforge-runpod](https://github.com/zobrak/chromaforge-runpod)
-- Restauration du venv depuis une archive pré-construite (~3.6 Go, ~25 min d'écriture sur NV)
+- Restauration du venv depuis Filebase IPFS (~3.6 Go compressés, ~25 min d'écriture sur NV)
+  - Intégrité vérifiée par SHA256 après téléchargement
+  - Fallback automatique vers webui.sh si échec
 - Téléchargement des modèles Chroma depuis HuggingFace :
   - `Chroma1-HD.safetensors` (~17 Go)
   - `t5xxl_fp16.safetensors` (~9 Go)
@@ -50,13 +55,29 @@ Démarrage complet en moins d'une minute — venv et modèles déjà présents s
 |---|---|---|
 | `EXTRA_ARGS` | Arguments supplémentaires passés à webui.py | `--pin-shared-memory --cuda-stream` |
 
-`EXTRA_ARGS` permet de personnaliser le comportement de ChromaForge sans rebuild de l'image. Les flags `--listen`, `--port 7860`, `--skip-torch-cuda-test`, `--enable-insecure-extension-access` et `--cuda-malloc` sont déjà inclus par défaut.
+`EXTRA_ARGS` permet de personnaliser le comportement de ChromaForge sans rebuild de l'image. Les flags suivants sont inclus par défaut :
+
+```
+--listen --port 7860 --skip-torch-cuda-test
+--enable-insecure-extension-access --cuda-malloc --log-level WARNING
+```
 
 ## Accès à l'interface
 
 ChromaForge démarre automatiquement. L'UI est accessible via :
 
 **RunPod Console → Connect → HTTP Service → Port 7860**
+
+## Paramètres recommandés pour Chroma1-HD
+
+| Paramètre | Valeur recommandée |
+|---|---|
+| Sampler | Euler |
+| Schedule | Beta 5-7 |
+| Steps | 26 à 40 |
+| CFG Scale | 3 à 4 |
+| Distilled CFG | 3.5 (valeur par défaut) |
+| Negative prompt | Fonctionne — recommandé |
 
 ## Logs
 
@@ -75,3 +96,4 @@ RTX 4090 (24 Go VRAM) — requis pour Chroma1-HD en inférence.
 - [ChromaForge (fork RunPod)](https://github.com/zobrak/chromaforge-runpod)
 - [ChromaForge (original)](https://github.com/maybleMyers/chromaforge)
 - [Modèle Chroma1-HD](https://huggingface.co/lodestones/Chroma1-HD)
+- [Guide Chroma (levzzz)](https://github.com/maybleMyers/chromaforge/blob/main/levzzz_chroma_guide.md)

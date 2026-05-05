@@ -35,7 +35,7 @@ readonly HF_BIN="$HF_VENV/bin/hf"
 readonly LOG_DIR="/workspace/logs"
 readonly LOG="$LOG_DIR/runpod_chromaforge_run.log"
 readonly CF_LOG="$LOG_DIR/chromaforge.log"
-readonly VENV_ARCHIVE_URL="https://zobrak.net/downloads/venv.tar.zst"
+readonly VENV_ARCHIVE_URL="https://ipfs.filebase.io/ipfs/QmWVUupc1nyRp8P6NUoXDDBybGmAxK5nsG13NaDohMbXcy"
 readonly VENV_ARCHIVE_LOCAL="/workspace/venv.tar.zst"
 
 # =============================================================================
@@ -114,7 +114,7 @@ check_env() {
 # =============================================================================
 # [3/7] RESTAURATION DU VENV DEPUIS L'ARCHIVE
 # =============================================================================
-# Le venv pré-construit est hébergé sur zobrak.net (~3.6 Go compressé).
+# Le venv pré-construit est hébergé sur Filebase IPFS (~3.6 Go compressé).
 # Durée estimée : 2-3 min téléchargement + 20-25 min décompression sur NV.
 # Si le venv existe déjà sur le volume persistant, étape skippée.
 # En cas d'échec, webui.sh reconstruit le venv depuis zéro (fallback).
@@ -129,7 +129,7 @@ restore_venv() {
         return 0
     fi
 
-    log "  Venv absent — téléchargement de l'archive depuis zobrak.net"
+    log "  Venv absent — téléchargement de l'archive depuis Filebase IPFS"
 
     # S'assurer que zstd est disponible
     if ! command -v zstd &>/dev/null; then
@@ -151,6 +151,23 @@ restore_venv() {
         }
 
     log "  Archive téléchargée : $(du -h "$VENV_ARCHIVE_LOCAL" | cut -f1)"
+
+    # Vérification intégrité SHA256 depuis /opt/venv.tar.zst.sha256
+    local sha256_file="/opt/venv.tar.zst.sha256"
+    if [ -f "$sha256_file" ]; then
+        log "  Vérification SHA256..."
+        local actual_sha expected_sha
+        actual_sha=$(sha256sum "$VENV_ARCHIVE_LOCAL" | cut -d' ' -f1)
+        expected_sha=$(awk '{print $1}' "$sha256_file")
+        if [ "$actual_sha" != "$expected_sha" ]; then
+            log "  WARN : SHA256 invalide — archive corrompue, reconstruction par webui.sh"
+            rm -f "$VENV_ARCHIVE_LOCAL"
+            return 0
+        fi
+        log "  OK : SHA256 vérifié"
+    else
+        log "  WARN : /opt/venv.tar.zst.sha256 absent — vérification SHA256 ignorée"
+    fi
 
     # Décompression — l'archive contient venv/ relatif à APP_DIR.
     # pv affiche le débit et la progression en temps réel.
@@ -221,7 +238,7 @@ setup_hf_cli() {
             # Laisser tomber dans le bloc de création ci-dessous
         else
             log "  Mise à jour huggingface_hub (hf absent du venv existant)"
-            "$HF_VENV/bin/pip" install --quiet --upgrade "huggingface_hub[cli]" \
+            "$HF_VENV/bin/pip" install --quiet --upgrade "huggingface_hub" \
                 || fail "Échec mise à jour huggingface_hub"
             [ -x "$HF_BIN" ] || fail "hf introuvable après mise à jour : $HF_BIN"
             log "  OK : huggingface_hub mis à jour"
@@ -235,7 +252,7 @@ setup_hf_cli() {
         || fail "Impossible de créer le venv HF : $HF_VENV"
     "$HF_VENV/bin/pip" install --quiet --upgrade pip \
         || fail "Échec upgrade pip dans le venv HF"
-    "$HF_VENV/bin/pip" install --quiet "huggingface_hub[cli]" \
+    "$HF_VENV/bin/pip" install --quiet "huggingface_hub" \
         || fail "Échec installation huggingface_hub"
     [ -x "$HF_BIN" ] || fail "hf introuvable après installation : $HF_BIN"
     log "  OK : huggingface_hub installé ($HF_BIN)"
@@ -299,14 +316,14 @@ write_webui_user_sh() {
 # =======================================================================
 
 # Arguments de lancement transmis à webui.py via launch.py
-export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc${auth_arg}${extra_args}"
+export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc --log-level WARNING${auth_arg}${extra_args}"
 WEBUIEOF
 
     mv "$tmp_file" "$APP_DIR/webui-user.sh"
 
     log "  OK : webui-user.sh généré"
     # Ne pas logger le mot de passe en clair
-    local log_args="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc"
+    local log_args="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc --log-level WARNING"
     if [ -n "${WEBUI_USER:-}" ] && [ -n "${WEBUI_PASSWORD:-}" ]; then
         log_args="$log_args --gradio-auth ${WEBUI_USER}:***"
     fi
@@ -334,7 +351,7 @@ launch_chromaforge() {
     # Activation explicite du venv avant webui.sh — évite la réinstallation
     # des requirements par webui.sh quand le venv n'est pas activé
     su forge -s /bin/bash -c \
-        "cd '$APP_DIR' && source venv/bin/activate && ./webui.sh" \
+        "cd $APP_DIR && source $APP_DIR/venv/bin/activate && $APP_DIR/webui.sh" \
         >> "$CF_LOG" 2>&1 &
 
     log "  OK : ChromaForge lancé en arrière-plan (PID $!)"

@@ -13,12 +13,12 @@
 #
 # Variables d'environnement attendues :
 #   Secrets RunPod :
-#   PUBLIC_KEY       — clé SSH publique (optionnel)
-#   JUPYTER_PASSWORD — mot de passe JupyterLab (optionnel)
-#   WEBUI_USER       — utilisateur Gradio (optionnel, exporté pour run.sh)
-#   WEBUI_PASSWORD   — mot de passe Gradio (optionnel, exporté pour run.sh)
+#     PUBLIC_KEY       — clé SSH publique (optionnel)
+#     JUPYTER_PASSWORD — mot de passe JupyterLab (optionnel)
+#     WEBUI_USER       — utilisateur Gradio (optionnel, exporté pour run.sh)
+#     WEBUI_PASSWORD   — mot de passe Gradio (optionnel, exporté pour run.sh)
 #   Variables de template RunPod :
-#   EXTRA_ARGS       — args supplémentaires webui.py ex: --pin-shared-memory
+#     EXTRA_ARGS       — args supplémentaires webui.py ex: --pin-shared-memory
 #
 # Logs : /workspace/logs/runpod_chromaforge_start.log
 # =============================================================================
@@ -181,7 +181,7 @@ echo "============================================================"
 if [ -f /workspace/runpod_chromaforge_run.sh ]; then
     echo " Attente du réseau..."
     _retries=0
-    until curl -sf --max-time 3 https://zobrak.net &>/dev/null; do
+    until curl -sf --max-time 3 https://ipfs.filebase.io &>/dev/null; do
         _retries=$(( _retries + 1 ))
         if [ "$_retries" -ge 30 ]; then
             echo " WARN : réseau indisponible après 90s — lancement quand même"
