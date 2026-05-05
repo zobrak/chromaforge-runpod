@@ -5,6 +5,18 @@ Format : [SemVer](https://semver.org/) — MAJEUR.MINEUR.PATCH
 
 ---
 
+## [1.0.2] — 2026-05-05
+
+### Corrections
+
+#### runpod_chromaforge_run.sh
+- Suppression de `--log-level WARNING` des `COMMANDLINE_ARGS` par défaut — le flag correct est `--loglevel` (sans tiret), à passer via `EXTRA_ARGS` si nécessaire
+
+#### README.md
+- Paramètres Chroma1-HD : scheduler conseillé corrigé de "Beta 5-7" à "Beta"
+
+---
+
 ## [1.0.1] — 2026-05-05
 
 ### Corrections

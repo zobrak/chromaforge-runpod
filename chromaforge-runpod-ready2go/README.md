@@ -1,6 +1,6 @@
 # ChromaForge RunPod — Ready to Go
 
-**Version 1.0.1**
+**Version 1.0.2**
 
 Fork de Stable Diffusion WebUI Forge optimisé pour le modèle Chroma, déployable sur RunPod avec un volume persistant vierge. ChromaForge démarre automatiquement au lancement du pod.
 
@@ -73,7 +73,7 @@ ChromaForge démarre automatiquement. L'UI est accessible via :
 | Paramètre | Valeur recommandée |
 |---|---|
 | Sampler | Euler |
-| Schedule | Beta 5-7 |
+| Schedule | Beta |
 | Steps | 26 à 40 |
 | CFG Scale | 3 à 4 |
 | Distilled CFG | 3.5 (valeur par défaut) |
