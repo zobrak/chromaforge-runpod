@@ -316,14 +316,14 @@ write_webui_user_sh() {
 # =======================================================================
 
 # Arguments de lancement transmis à webui.py via launch.py
-export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc --log-level WARNING${auth_arg}${extra_args}"
+export COMMANDLINE_ARGS="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc ${auth_arg}${extra_args}"
 WEBUIEOF
 
     mv "$tmp_file" "$APP_DIR/webui-user.sh"
 
     log "  OK : webui-user.sh généré"
     # Ne pas logger le mot de passe en clair
-    local log_args="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc --log-level WARNING"
+    local log_args="--listen --port 7860 --skip-torch-cuda-test --enable-insecure-extension-access --cuda-malloc"
     if [ -n "${WEBUI_USER:-}" ] && [ -n "${WEBUI_PASSWORD:-}" ]; then
         log_args="$log_args --gradio-auth ${WEBUI_USER}:***"
     fi
