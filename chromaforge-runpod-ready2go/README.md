@@ -91,6 +91,24 @@ ChromaForge démarre automatiquement. L'UI est accessible via :
 
 RTX 4090 (24 Go VRAM) — requis pour Chroma1-HD en inférence.
 
+## Build de l'image
+
+Les fichiers de build sont disponibles dans le dépôt GitHub :
+
+**[zobrak/chromaforge-runpod → dossier `chromaforge-runpod-ready2go`](https://github.com/zobrak/chromaforge-runpod/tree/main/chromaforge-runpod-ready2go)**
+
+```
+chromaforge-runpod-ready2go/
+├── Dockerfile
+├── docker-entrypoint.sh
+├── runpod_chromaforge_start.sh
+├── runpod_chromaforge_run.sh
+├── venv.tar.zst.sha256
+├── .bashrc
+├── README.md
+└── CHANGELOG.md
+```
+
 ## Sources
 
 - [ChromaForge (fork RunPod)](https://github.com/zobrak/chromaforge-runpod)
