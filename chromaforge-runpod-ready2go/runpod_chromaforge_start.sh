@@ -180,14 +180,16 @@ echo "============================================================"
 # (les téléchargements échouent si run.sh démarre avant l'init réseau)
 if [ -f /workspace/runpod_chromaforge_run.sh ]; then
     echo " Attente du réseau..."
+    # Teste la connectivité IP directe sans résolution DNS (8.8.8.8 = Google DNS)
+    # Plus fiable qu'un test HTTP au démarrage où le DNS peut ne pas être encore prêt
     _retries=0
-    until curl -sf --max-time 3 https://ipfs.filebase.io &>/dev/null; do
+    until ping -c1 -W2 8.8.8.8 &>/dev/null; do
         _retries=$(( _retries + 1 ))
-        if [ "$_retries" -ge 30 ]; then
-            echo " WARN : réseau indisponible après 90s — lancement quand même"
+        if [ "$_retries" -ge 15 ]; then
+            echo " WARN : réseau indisponible après 30s — lancement quand même"
             break
         fi
-        sleep 3
+        sleep 2
     done
     echo " Lancement automatique de runpod_chromaforge_run.sh..."
     bash /workspace/runpod_chromaforge_run.sh &

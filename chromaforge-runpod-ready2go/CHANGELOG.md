@@ -5,6 +5,16 @@ Format : [SemVer](https://semver.org/) — MAJEUR.MINEUR.PATCH
 
 ---
 
+## [1.0.1] — 2026-05-05
+
+### Corrections
+
+#### runpod_chromaforge_start.sh
+- Remplacement du test réseau `curl https://ipfs.filebase.io` par `ping 8.8.8.8` — plus fiable au démarrage car ne dépend pas de la résolution DNS, qui peut ne pas être encore opérationnelle
+- Délai d'attente réduit de 90s à 30s (15 essais × 2s)
+
+---
+
 ## [1.0.0] — 2026-05-04
 
 ### Première version stable

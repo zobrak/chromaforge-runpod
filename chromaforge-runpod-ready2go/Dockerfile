@@ -27,7 +27,7 @@ FROM runpod/pytorch:2.2.0-py3.10-cuda12.1.1-devel-ubuntu22.04
 # Métadonnées
 LABEL maintainer="zobrak"
 LABEL description="ChromaForge on RunPod — Flux/Chroma image generation"
-LABEL version="1.0.0"
+LABEL version="1.0.1"
 
 # Évite les interactions lors des installations apt
 ENV DEBIAN_FRONTEND=noninteractive
